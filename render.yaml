@@ -1,0 +1,32 @@
+services:
+  # ---------- Backend (FastAPI) ----------
+  - type: web
+    name: wiki-ilmix-backend
+    env: python
+    plan: free                # 750 hrs/mo, 512 MiB RAM – perfect for a hobby API
+    region: oregon            # any free region works
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    # Add any secrets you need (e.g. Gemini key)
+    envVars:
+      # GOOGLE_API_KEY: your‑key‑here   # ← add via Render UI instead of committing
+    # Optional health‑check (Render looks for a 200 on “/”)
+    healthCheckPath: /docs
+
+  # ---------- Frontend (Static site) ----------
+  - type: static
+    name: wiki-ilmix-frontend
+    env: static
+    plan: free                # 100 GB bandwidth, 500 MB storage – more than enough
+    region: oregon
+    # Render runs `npm ci && npm run build` by default if a package.json exists.
+    # Point it to the sub‑folder that contains the React app.
+    staticPublishPath: frontend/dist
+    # Build step – run inside the repo root, then cd into the folder.
+    buildCommand: |
+      cd frontend &&
+      npm ci &&
+      npm run build
+    # -------------------------------------------------
+    # If you want to expose a custom domain, add it later in the UI.
+    # -------------------------------------------------
