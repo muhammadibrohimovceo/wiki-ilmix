@@ -10,7 +10,15 @@ load_dotenv()
 
 app = FastAPI()
 
-# Allow CORS for the frontend (Vite defaults to 5173)
+# Allow requests from any origin (frontend and backend are on different domains on Render)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
